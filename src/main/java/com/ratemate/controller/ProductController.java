@@ -1,4 +1,4 @@
-java
+
 package com.ratemate.controller;
 
 import com.ratemate.model.Product;
@@ -26,8 +26,7 @@ public class ProductController {
     private final ProductRepository products;
     private final ReviewRepository reviews;
 
-    public ProductController(ProductRepository products,
-                             ReviewRepository reviews) {
+    public ProductController(ProductRepository products, ReviewRepository reviews) {
         this.products = products;
         this.reviews = reviews;
     }
@@ -50,15 +49,13 @@ public class ProductController {
         if (category != null && !category.isBlank()
                 && !category.equalsIgnoreCase("All")) {
             all = all.stream()
-                    .filter(p -> p.getCategory()
-                            .equalsIgnoreCase(category))
+                    .filter(p -> p.getCategory().equalsIgnoreCase(category))
                     .toList();
         }
 
         model.addAttribute("products", all);
         model.addAttribute("q", q == null ? "" : q);
-        model.addAttribute("category",
-                category == null ? "All" : category);
+        model.addAttribute("category", category == null ? "All" : category);
         model.addAttribute("totalProducts", products.count());
         model.addAttribute("totalReviews", reviews.count());
 
@@ -66,20 +63,18 @@ public class ProductController {
     }
 
     @GetMapping("/products/{id}")
-    public String product(@PathVariable Long id,
-                          Model model,
+    public String product(@PathVariable Long id, Model model,
                           HttpServletRequest request,
                           RedirectAttributes redirect) {
 
-        var productResult = products.findById(id);
+        var result = products.findById(id);
 
-        if (productResult.isEmpty()) {
-            redirect.addFlashAttribute(
-                    "error", "That product could not be found.");
+        if (result.isEmpty()) {
+            redirect.addFlashAttribute("error", "That product could not be found.");
             return "redirect:/";
         }
 
-        Product product = productResult.get();
+        Product product = result.get();
         Set<Long> manageableReviewIds = new HashSet<>();
 
         for (Review review : product.getReviews()) {
@@ -107,9 +102,9 @@ public class ProductController {
                             HttpServletResponse response,
                             RedirectAttributes redirect) {
 
-        var product = products.findById(id);
+        var result = products.findById(id);
 
-        if (product.isEmpty()) {
+        if (result.isEmpty()) {
             return "redirect:/";
         }
 
@@ -118,30 +113,21 @@ public class ProductController {
                 || rating < 1 || rating > 5
                 || comment == null || comment.isBlank()
                 || comment.length() > 1500) {
-
             redirect.addFlashAttribute("error",
                     "Enter a name, choose 1–5 stars, and write a review (max 1500 characters).");
-
             return "redirect:/products/" + id;
         }
 
         Review review = new Review(
-                reviewerName.trim(),
-                rating,
-                comment.trim(),
-                product.get()
-        );
+                reviewerName.trim(), rating, comment.trim(), result.get());
 
         String token = UUID.randomUUID().toString();
         review.setEditToken(token);
-
         reviews.save(review);
 
         setReviewCookie(response, request, id, review.getId(), token);
 
-        redirect.addFlashAttribute(
-                "success", "Thanks! Your review has been submitted.");
-
+        redirect.addFlashAttribute("success", "Thanks! Your review has been submitted.");
         return "redirect:/products/" + id;
     }
 
@@ -154,17 +140,15 @@ public class ProductController {
                              HttpServletRequest request,
                              RedirectAttributes redirect) {
 
-        var reviewResult = reviews.findById(reviewId);
+        var result = reviews.findById(reviewId);
 
-        if (reviewResult.isEmpty()
-                || !reviewResult.get().getProduct().getId()
-                        .equals(productId)) {
-            redirect.addFlashAttribute("error",
-                    "Review not found.");
+        if (result.isEmpty()
+                || !result.get().getProduct().getId().equals(productId)) {
+            redirect.addFlashAttribute("error", "Review not found.");
             return "redirect:/products/" + productId;
         }
 
-        Review review = reviewResult.get();
+        Review review = result.get();
         String token = getReviewToken(request, reviewId);
 
         if (!isAuthorized(review, token)) {
@@ -178,7 +162,6 @@ public class ProductController {
                 || rating < 1 || rating > 5
                 || comment == null || comment.isBlank()
                 || comment.length() > 1500) {
-
             redirect.addFlashAttribute("error",
                     "Check your name, rating, and review text.");
             return "redirect:/products/" + productId;
@@ -187,12 +170,9 @@ public class ProductController {
         review.setReviewerName(reviewerName.trim());
         review.setRating(rating);
         review.setComment(comment.trim());
-
         reviews.save(review);
 
-        redirect.addFlashAttribute(
-                "success", "Your review has been updated.");
-
+        redirect.addFlashAttribute("success", "Your review has been updated.");
         return "redirect:/products/" + productId;
     }
 
@@ -203,17 +183,15 @@ public class ProductController {
                                HttpServletResponse response,
                                RedirectAttributes redirect) {
 
-        var reviewResult = reviews.findById(reviewId);
+        var result = reviews.findById(reviewId);
 
-        if (reviewResult.isEmpty()
-                || !reviewResult.get().getProduct().getId()
-                        .equals(productId)) {
-            redirect.addFlashAttribute("error",
-                    "Review not found.");
+        if (result.isEmpty()
+                || !result.get().getProduct().getId().equals(productId)) {
+            redirect.addFlashAttribute("error", "Review not found.");
             return "redirect:/products/" + productId;
         }
 
-        Review review = reviewResult.get();
+        Review review = result.get();
         String token = getReviewToken(request, reviewId);
 
         if (!isAuthorized(review, token)) {
@@ -223,44 +201,34 @@ public class ProductController {
         }
 
         reviews.delete(review);
-
         expireReviewCookie(response, request, productId, reviewId);
 
-        redirect.addFlashAttribute(
-                "success", "Your review has been deleted.");
-
+        redirect.addFlashAttribute("success", "Your review has been deleted.");
         return "redirect:/products/" + productId;
     }
 
     private boolean isAuthorized(Review review, String token) {
-        return token != null
-                && review.getEditToken() != null
+        return token != null && review.getEditToken() != null
                 && tokensMatch(token, review.getEditToken());
     }
 
     private boolean tokensMatch(String first, String second) {
         return MessageDigest.isEqual(
                 first.getBytes(java.nio.charset.StandardCharsets.UTF_8),
-                second.getBytes(java.nio.charset.StandardCharsets.UTF_8)
-        );
+                second.getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
 
     private String cookieName(Long reviewId) {
         return "review_token_" + reviewId;
     }
 
-    private String getReviewToken(HttpServletRequest request,
-                                  Long reviewId) {
+    private String getReviewToken(HttpServletRequest request, Long reviewId) {
         Cookie[] cookies = request.getCookies();
 
-        if (cookies == null) {
-            return null;
-        }
-
-        String expectedName = cookieName(reviewId);
+        if (cookies == null) return null;
 
         for (Cookie cookie : cookies) {
-            if (expectedName.equals(cookie.getName())) {
+            if (cookieName(reviewId).equals(cookie.getName())) {
                 return cookie.getValue();
             }
         }
@@ -270,45 +238,29 @@ public class ProductController {
 
     private void setReviewCookie(HttpServletResponse response,
                                  HttpServletRequest request,
-                                 Long productId,
-                                 Long reviewId,
-                                 String token) {
-
+                                 Long productId, Long reviewId, String token) {
         String header = cookieName(reviewId) + "=" + token
                 + "; Path=/products/" + productId
-                + "; Max-Age=31536000"
-                + "; HttpOnly; SameSite=Lax";
+                + "; Max-Age=31536000; HttpOnly; SameSite=Lax";
 
-        if (isHttps(request)) {
-            header += "; Secure";
-        }
-
+        if (isHttps(request)) header += "; Secure";
         response.addHeader("Set-Cookie", header);
     }
 
     private void expireReviewCookie(HttpServletResponse response,
                                     HttpServletRequest request,
-                                    Long productId,
-                                    Long reviewId) {
-
+                                    Long productId, Long reviewId) {
         String header = cookieName(reviewId) + "="
                 + "; Path=/products/" + productId
-                + "; Max-Age=0"
-                + "; HttpOnly; SameSite=Lax";
+                + "; Max-Age=0; HttpOnly; SameSite=Lax";
 
-        if (isHttps(request)) {
-            header += "; Secure";
-        }
-
+        if (isHttps(request)) header += "; Secure";
         response.addHeader("Set-Cookie", header);
     }
 
     private boolean isHttps(HttpServletRequest request) {
-        String forwardedProto = request.getHeader("X-Forwarded-Proto");
-
+        String proto = request.getHeader("X-Forwarded-Proto");
         return request.isSecure()
-                || (forwardedProto != null
-                && forwardedProto.equalsIgnoreCase("https"));
+                || (proto != null && proto.equalsIgnoreCase("https"));
     }
 }
-
