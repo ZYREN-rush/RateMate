@@ -1,4 +1,4 @@
-java
+
 package com.ratemate.model;
 
 import jakarta.persistence.*;
@@ -29,8 +29,7 @@ public class Review {
 
     public Review() {}
 
-    public Review(String reviewerName, int rating,
-                  String comment, Product product) {
+    public Review(String reviewerName, int rating, String comment, Product product) {
         this.reviewerName = reviewerName;
         this.rating = rating;
         this.comment = comment;
@@ -38,38 +37,16 @@ public class Review {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getReviewerName() {
-        return reviewerName;
-    }
-
-    public int getRating() {
-        return rating;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public String getEditToken() {
-        return editToken;
-    }
+    public Long getId() { return id; }
+    public String getReviewerName() { return reviewerName; }
+    public int getRating() { return rating; }
+    public String getComment() { return comment; }
+    public Product getProduct() { return product; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public String getEditToken() { return editToken; }
 
     public String getFormattedDate() {
-        return createdAt.format(
-            DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")
-        );
+        return createdAt.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm"));
     }
 
     public void setReviewerName(String reviewerName) {
@@ -88,4 +65,3 @@ public class Review {
         this.editToken = editToken;
     }
 }
-
