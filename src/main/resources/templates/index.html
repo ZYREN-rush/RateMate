@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RateMate — Find your next favourite</title><link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<header class="topbar"><a class="brand" th:href="@{/}"><span class="brand-icon">R</span> rate<span>mate</span></a>
+<nav><a class="nav-active" th:href="@{/}">Explore</a><a href="#how-it-works">How it works</a></nav><a class="nav-cta" href="#products">Explore products <span>↗</span></a></header>
+<main>
+<section class="hero">
+  <div class="hero-copy"><div class="eyebrow"><span class="pulse"></span> REAL PEOPLE. REAL OPINIONS.</div>
+  <h1>Buy better.<br><span>Choose smarter.</span></h1>
+  <p class="hero-sub">Honest ratings and thoughtful reviews to help you find products that are actually worth it.</p>
+  <a class="primary-btn" href="#products">Explore products <span>→</span></a>
+  <div class="hero-proof"><div class="avatar-stack"><b>Y</b><b>A</b><b>S</b><b>+</b></div><span>Powered by community feedback</span></div></div>
+  <div class="hero-visual"><div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div>
+    <div class="floating-card rating-float"><div class="mini-label">COMMUNITY RATING</div><div class="big-rating">4.8 <span>★</span></div><div class="gold-stars">★★★★★</div><small>Based on customer reviews</small></div>
+    <div class="hero-product"><div class="product-glow"></div><img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=90" alt="Premium headphones"></div>
+    <div class="floating-card review-float"><span class="quote-mark">“</span><p>Quality that speaks for itself.</p><small>— A verified-style community review</small></div>
+  </div>
+</section>
+<section class="stats-strip"><div><strong th:text="${totalProducts}">4</strong><span>Products to explore</span></div><div><strong th:text="${totalReviews}">0</strong><span>Community reviews</span></div><div><strong>1–5 <i>★</i></strong><span>Simple star ratings</span></div><div><strong>100%</strong><span>Feedback focused</span></div></section>
+<section class="catalogue" id="products">
+  <div class="section-heading"><div><div class="eyebrow">THE COMMUNITY PICKS</div><h2>Find your next <span>favourite.</span></h2><p>Explore products and see what people really think.</p></div>
+  <form class="search-form" method="get" th:action="@{/}"><input name="q" th:value="${q}" placeholder="Search products..." aria-label="Search products"><button type="submit">Search ↗</button></form></div>
+  <div class="filter-row"><span class="filter-label">BROWSE BY</span><a th:href="@{/}" th:classappend="${category == 'All'} ? ' selected' : ''">All products</a><a th:href="@{/(category='Electronics')}" th:classappend="${category == 'Electronics'} ? ' selected' : ''">Electronics</a><a th:href="@{/(category='Lifestyle')}" th:classappend="${category == 'Lifestyle'} ? ' selected' : ''">Lifestyle</a></div>
+  <div class="product-grid">
+    <article class="product-card" th:each="p, stat : ${products}">
+      <a class="product-image" th:href="@{/products/{id}(id=${p.id})}"><img th:src="${p.imageUrl}" th:alt="${p.name}" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80'"><span class="product-number" th:text="${stat.count < 10 ? '0' + stat.count : stat.count}">01</span><span class="view-pill">View product ↗</span></a>
+      <div class="product-info"><div class="product-meta"><span th:text="${p.category}">Category</span><span class="stars" th:text="${p.reviewCount > 0 ? '★' : '☆'}">☆</span></div>
+        <a class="product-name" th:href="@{/products/{id}(id=${p.id})}" th:text="${p.name}">Product name</a>
+        <p class="product-description" th:text="${p.description}">Description</p>
+        <div class="product-bottom"><strong class="price" th:text="${'₹' + #numbers.formatDecimal(p.price, 1, 'COMMA', 0, 'POINT')}">₹2,499</strong><div class="rating-summary"><strong th:text="${p.reviewCount > 0 ? #numbers.formatDecimal(p.averageRating, 1, 1) : 'New'}">New</strong><span th:text="${'(' + p.reviewCount + ' reviews)'}">(0 reviews)</span></div></div>
+      </div>
+    </article>
+    <div class="empty-state" th:if="${#lists.isEmpty(products)}"><h3>No products found</h3><p>Try another search or category.</p><a class="primary-btn" th:href="@{/}">Clear filters →</a></div>
+  </div>
+</section>
+<section class="how-section" id="how-it-works"><div><div class="eyebrow">SIMPLE BY DESIGN</div><h2>Good decisions start<br>with <span>good feedback.</span></h2></div><div class="steps"><div><b>01</b><section><h3>Discover</h3><p>Browse products by name or category.</p></section></div><div><b>02</b><section><h3>Compare</h3><p>Check average ratings and read customer experiences.</p></section></div><div><b>03</b><section><h3>Contribute</h3><p>Rate a product and share your own review.</p></section></div></div></section>
+</main>
+<footer><a class="brand" th:href="@{/}"><span class="brand-icon">R</span> rate<span>mate</span></a><p>Better choices, built on honest feedback.</p><span>JAVA • SPRING BOOT • THYMELEAF</span></footer>
+</body></html>
