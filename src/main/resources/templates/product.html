@@ -1,24 +1,284 @@
+```html
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title th:text="${product.name + ' — RateMate'}">Product — RateMate</title><link rel="stylesheet" th:href="@{/style.css}"></head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${product.name + ' — RateMate'}">Product — RateMate</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <style>
+        .review-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .review-actions button,
+        .edit-review-form button {
+            border: 1px solid #d9dedb;
+            background: white;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font: inherit;
+        }
+        .review-actions .delete-button {
+            color: #b42318;
+        }
+        .edit-review-form {
+            margin-top: 14px;
+            padding: 14px;
+            background: #f7f9f7;
+            border-radius: 10px;
+        }
+        .edit-review-form label {
+            display: block;
+            margin-top: 10px;
+        }
+        .edit-review-form input,
+        .edit-review-form textarea {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d9dedb;
+            border-radius: 8px;
+            font: inherit;
+        }
+        .edit-review-form .edit-rating {
+            width: auto;
+            margin-right: 5px;
+        }
+        .edit-review-form .save-button {
+            margin-top: 12px;
+        }
+    </style>
+</head>
 <body>
-<header class="topbar"><a class="brand" th:href="@{/}"><span class="brand-icon">R</span> rate<span>mate</span></a><nav><a th:href="@{/}">Explore</a><a href="/#how-it-works">How it works</a></nav><a class="nav-cta" th:href="@{/}">← All products</a></header>
+
+<header class="topbar">
+    <a class="brand" th:href="@{/}">
+        <span class="brand-icon">R</span> rate<span>mate</span>
+    </a>
+    <nav>
+        <a th:href="@{/}">Explore</a>
+        <a href="/#how-it-works">How it works</a>
+    </nav>
+    <a class="nav-cta" th:href="@{/}">← All products</a>
+</header>
+
 <main class="detail-main">
-<div class="breadcrumbs"><a th:href="@{/}">Explore</a><span>/</span><span th:text="${product.category}">Category</span><span>/</span><span th:text="${product.name}">Product</span></div>
-<div class="detail-layout">
-<section class="detail-visual"><img th:src="${product.imageUrl}" th:alt="${product.name}" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80'"><span class="detail-tag" th:text="${product.category}">Category</span></section>
-<section class="detail-info"><div class="eyebrow">PRODUCT OVERVIEW</div><h1 th:text="${product.name}">Product name</h1><div class="detail-rating"><span class="stars">★★★★★</span><strong th:text="${product.reviewCount > 0 ? #numbers.formatDecimal(product.averageRating, 1, 1) : 'No ratings yet'}">No ratings yet</strong><span th:text="${'(' + product.reviewCount + ' reviews)'}">(0 reviews)</span></div><div class="detail-price" th:text="${'₹' + #numbers.formatDecimal(product.price, 1, 'COMMA', 0, 'POINT')}">₹2,499</div><p class="detail-description" th:text="${product.description}">Description</p><div class="detail-note"><span>✦</span> Your feedback helps other people make smarter decisions.</div><a class="primary-btn" href="#write-review">Write a review <span>↓</span></a></section>
-</div>
-<div class="review-columns"><section class="reviews-panel"><div class="panel-heading"><div><div class="eyebrow">COMMUNITY VOICES</div><h2>Customer reviews</h2></div><span class="count-pill" th:text="${product.reviewCount} + ' total'">0 total</span></div>
-<div class="review-empty" th:if="${#lists.isEmpty(product.reviews)}"><div class="empty-star">☆</div><h3>Be the first to review</h3><p>There are no reviews yet. Share your experience with the community.</p></div>
-<article class="review-item" th:each="r : ${product.reviews}"><div class="review-avatar" th:text="${#strings.toUpperCase(#strings.substring(r.reviewerName,0,1))}">Y</div><div class="review-content"><div class="review-top"><strong th:text="${r.reviewerName}">Reviewer</strong><span th:text="${r.formattedDate}">Date</span></div><div class="stars review-stars" th:text="${'★'.repeat(r.rating) + '☆'.repeat(5-r.rating)}">★★★★★</div><p th:text="${r.comment}">Review text</p></div></article>
-</section>
-<section class="write-panel" id="write-review"><div class="eyebrow">YOUR EXPERIENCE MATTERS</div><h2>Write a review<span>.</span></h2><p class="form-intro">Tell the community what you think. Be honest, be helpful.</p>
-<div class="flash success" th:if="${success}" th:text="${success}"></div><div class="flash error" th:if="${error}" th:text="${error}"></div>
-<form method="post" th:action="@{/products/{id}/reviews(id=${product.id})}" class="review-form">
-<label for="reviewerName">Your name</label><input id="reviewerName" name="reviewerName" maxlength="60" placeholder="e.g. Yash" required>
-<label>Your rating</label><div class="rating-select"><input type="radio" name="rating" id="star5" value="5" required><label for="star5" title="5 stars">★</label><input type="radio" name="rating" id="star4" value="4"><label for="star4" title="4 stars">★</label><input type="radio" name="rating" id="star3" value="3"><label for="star3" title="3 stars">★</label><input type="radio" name="rating" id="star2" value="2"><label for="star2" title="2 stars">★</label><input type="radio" name="rating" id="star1" value="1"><label for="star1" title="1 star">★</label></div>
-<label for="comment">Your review</label><textarea id="comment" name="comment" rows="5" maxlength="1500" placeholder="What did you like? What could be better?" required></textarea><button class="primary-btn submit-btn" type="submit">Submit review <span>→</span></button><small class="privacy-note">Please keep your feedback respectful and useful.</small>
-</form></section></div>
-</main><footer><a class="brand" th:href="@{/}"><span class="brand-icon">R</span> rate<span>mate</span></a><p>Better choices, built on honest feedback.</p><span>JAVA • SPRING BOOT • THYMELEAF</span></footer>
-</body></html>
+
+    <div class="breadcrumbs">
+        <a th:href="@{/}">Explore</a>
+        <span>/</span>
+        <span th:text="${product.category}">Category</span>
+        <span>/</span>
+        <span th:text="${product.name}">Product</span>
+    </div>
+
+    <div class="detail-layout">
+        <section class="detail-visual">
+            <img th:src="${product.imageUrl}"
+                 th:alt="${product.name}"
+                 onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80'">
+            <span class="detail-tag" th:text="${product.category}">Category</span>
+        </section>
+
+        <section class="detail-info">
+            <div class="eyebrow">PRODUCT OVERVIEW</div>
+            <h1 th:text="${product.name}">Product name</h1>
+
+            <div class="detail-rating">
+                <span class="stars">★★★★★</span>
+                <strong th:text="${product.reviewCount > 0 ? #numbers.formatDecimal(product.averageRating, 1, 1) : 'No ratings yet'}">No ratings yet</strong>
+                <span th:text="${'(' + product.reviewCount + ' reviews)'}">(0 reviews)</span>
+            </div>
+
+            <div class="detail-price"
+                 th:text="${'₹' + #numbers.formatDecimal(product.price, 1, 'COMMA', 0, 'POINT')}">₹2,499</div>
+
+            <p class="detail-description" th:text="${product.description}">Description</p>
+
+            <div class="detail-note">
+                <span>✦</span> Your feedback helps other people make smarter decisions.
+            </div>
+
+            <a class="primary-btn" href="#write-review">
+                Write a review <span>↓</span>
+            </a>
+        </section>
+    </div>
+
+    <div class="review-columns">
+
+        <section class="reviews-panel">
+            <div class="panel-heading">
+                <div>
+                    <div class="eyebrow">COMMUNITY VOICES</div>
+                    <h2>Customer reviews</h2>
+                </div>
+                <span class="count-pill"
+                      th:text="${product.reviewCount} + ' total'">0 total</span>
+            </div>
+
+            <div class="flash success" th:if="${success}" th:text="${success}"></div>
+            <div class="flash error" th:if="${error}" th:text="${error}"></div>
+
+            <div class="review-empty" th:if="${#lists.isEmpty(product.reviews)}">
+                <div class="empty-star">☆</div>
+                <h3>Be the first to review</h3>
+                <p>There are no reviews yet. Share your experience with the community.</p>
+            </div>
+
+            <article class="review-item" th:each="r : ${product.reviews}">
+                <div class="review-avatar"
+                     th:text="${#strings.toUpperCase(#strings.substring(r.reviewerName,0,1))}">Y</div>
+
+                <div class="review-content">
+                    <div class="review-top">
+                        <strong th:text="${r.reviewerName}">Reviewer</strong>
+                        <span th:text="${r.formattedDate}">Date</span>
+                    </div>
+
+                    <div class="stars review-stars"
+                         th:text="${'★'.repeat(r.rating) + '☆'.repeat(5-r.rating)}">★★★★★</div>
+
+                    <p th:text="${r.comment}">Review text</p>
+
+                    <div th:if="${manageableReviewIds.contains(r.id)}">
+
+                        <div class="review-actions">
+                            <button type="button"
+                                    th:attr="data-review-id=${r.id}"
+                                    onclick="toggleEdit(this)">
+                                Edit review
+                            </button>
+
+                            <form method="post"
+                                  th:action="@{/products/{productId}/reviews/{reviewId}/delete(productId=${product.id},reviewId=${r.id})}"
+                                  onsubmit="return confirm('Are you sure you want to permanently delete your review?');">
+                                <button class="delete-button" type="submit">
+                                    Delete review
+                                </button>
+                            </form>
+                        </div>
+
+                        <form class="edit-review-form"
+                              th:id="${'edit-form-' + r.id}"
+                              style="display:none"
+                              method="post"
+                              th:action="@{/products/{productId}/reviews/{reviewId}/edit(productId=${product.id},reviewId=${r.id})}">
+
+                            <label th:for="${'name-' + r.id}">Your name</label>
+                            <input th:id="${'name-' + r.id}"
+                                   name="reviewerName"
+                                   maxlength="60"
+                                   required
+                                   th:value="${r.reviewerName}">
+
+                            <label>Rating</label>
+                            <div>
+                                <th:block th:each="star : ${#numbers.sequence(5,1,-1)}">
+                                    <input class="edit-rating"
+                                           type="radio"
+                                           name="rating"
+                                           required
+                                           th:id="${'rating-' + r.id + '-' + star}"
+                                           th:value="${star}"
+                                           th:checked="${r.rating == star}">
+                                    <label style="display:inline"
+                                           th:for="${'rating-' + r.id + '-' + star}"
+                                           th:text="${star + '★'}">5★</label>
+                                </th:block>
+                            </div>
+
+                            <label th:for="${'comment-' + r.id}">Your review</label>
+                            <textarea th:id="${'comment-' + r.id}"
+                                      name="comment"
+                                      rows="4"
+                                      maxlength="1500"
+                                      required
+                                      th:text="${r.comment}"></textarea>
+
+                            <button class="save-button" type="submit">
+                                Save changes
+                            </button>
+                            <button type="button" onclick="toggleEdit(this)"
+                                    th:attr="data-review-id=${r.id}">
+                                Cancel
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="write-panel" id="write-review">
+            <div class="eyebrow">YOUR EXPERIENCE MATTERS</div>
+            <h2>Write a review<span>.</span></h2>
+            <p class="form-intro">Tell the community what you think. Be honest, be helpful.</p>
+
+            <form method="post"
+                  th:action="@{/products/{id}/reviews(id=${product.id})}"
+                  class="review-form">
+
+                <label for="reviewerName">Your name</label>
+                <input id="reviewerName"
+                       name="reviewerName"
+                       maxlength="60"
+                       placeholder="e.g. Yash"
+                       required>
+
+                <label>Your rating</label>
+                <div class="rating-select">
+                    <input type="radio" name="rating" id="star5" value="5" required>
+                    <label for="star5" title="5 stars">★</label>
+                    <input type="radio" name="rating" id="star4" value="4">
+                    <label for="star4" title="4 stars">★</label>
+                    <input type="radio" name="rating" id="star3" value="3">
+                    <label for="star3" title="3 stars">★</label>
+                    <input type="radio" name="rating" id="star2" value="2">
+                    <label for="star2" title="2 stars">★</label>
+                    <input type="radio" name="rating" id="star1" value="1">
+                    <label for="star1" title="1 star">★</label>
+                </div>
+
+                <label for="comment">Your review</label>
+                <textarea id="comment"
+                          name="comment"
+                          rows="5"
+                          maxlength="1500"
+                          placeholder="What did you like? What could be better?"
+                          required></textarea>
+
+                <button class="primary-btn submit-btn" type="submit">
+                    Submit review <span>→</span>
+                </button>
+                <small class="privacy-note">Please keep your feedback respectful and useful.</small>
+            </form>
+        </section>
+    </div>
+</main>
+
+<footer>
+    <a class="brand" th:href="@{/}">
+        <span class="brand-icon">R</span> rate<span>mate</span>
+    </a>
+    <p>Better choices, built on honest feedback.</p>
+    <span>JAVA • SPRING BOOT • THYMELEAF</span>
+</footer>
+
+<script>
+    function toggleEdit(button) {
+        const id = button.dataset.reviewId;
+        const form = document.getElementById('edit-form-' + id);
+
+        if (form) {
+            form.style.display =
+                form.style.display === 'none' ? 'block' : 'none';
+        }
+    }
+</script>
+
+</body>
+</html>
+```
