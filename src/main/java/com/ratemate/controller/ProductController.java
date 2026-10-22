@@ -1,4 +1,4 @@
-```java
+java
 package com.ratemate.controller;
 
 import com.ratemate.model.Product;
@@ -311,4 +311,4 @@ public class ProductController {
                 && forwardedProto.equalsIgnoreCase("https"));
     }
 }
-```
+
