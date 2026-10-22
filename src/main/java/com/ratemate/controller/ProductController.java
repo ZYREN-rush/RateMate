@@ -1,3 +1,4 @@
+```java
 package com.ratemate.controller;
 
 import com.ratemate.model.Product;
@@ -11,40 +12,57 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class ProductController {
+
     private final ProductRepository products;
     private final ReviewRepository reviews;
 
-    public ProductController(ProductRepository products, ReviewRepository reviews) {
-        this.products = products; this.reviews = reviews;
+    public ProductController(ProductRepository products,
+                             ReviewRepository reviews) {
+        this.products = products;
+        this.reviews = reviews;
     }
 
     @GetMapping("/")
     public String home(@RequestParam(required = false) String q,
-                       @RequestParam(required = false) String category, Model model) {
+                       @RequestParam(required = false) String category,
+                       Model model) {
         var all = products.findAll();
+
         if (q != null && !q.isBlank()) {
             String term = q.toLowerCase();
-            all = all.stream().filter(p -> p.getName().toLowerCase().contains(term)
-                    || p.getCategory().toLowerCase().contains(term)).toList();
+            all = all.stream()
+                    .filter(p -> p.getName().toLowerCase().contains(term)
+                            || p.getCategory().toLowerCase().contains(term))
+                    .toList();
         }
-        if (category != null && !category.isBlank() && !category.equalsIgnoreCase("All")) {
-            all = all.stream().filter(p -> p.getCategory().equalsIgnoreCase(category)).toList();
+
+        if (category != null && !category.isBlank()
+                && !category.equalsIgnoreCase("All")) {
+            all = all.stream()
+                    .filter(p -> p.getCategory().equalsIgnoreCase(category))
+                    .toList();
         }
+
         model.addAttribute("products", all);
         model.addAttribute("q", q == null ? "" : q);
         model.addAttribute("category", category == null ? "All" : category);
         model.addAttribute("totalProducts", products.count());
         model.addAttribute("totalReviews", reviews.count());
+
         return "index";
     }
 
     @GetMapping("/products/{id}")
-    public String product(@PathVariable Long id, Model model, RedirectAttributes redirect) {
+    public String product(@PathVariable Long id, Model model,
+                          RedirectAttributes redirect) {
         var product = products.findById(id);
+
         if (product.isEmpty()) {
-            redirect.addFlashAttribute("error", "That product could not be found.");
+            redirect.addFlashAttribute("error",
+                    "That product could not be found.");
             return "redirect:/";
         }
+
         model.addAttribute("product", product.get());
         model.addAttribute("review", new Review());
         return "product";
@@ -57,14 +75,25 @@ public class ProductController {
                             @RequestParam String comment,
                             RedirectAttributes redirect) {
         var product = products.findById(id);
+
         if (product.isEmpty()) return "redirect:/";
-        if (reviewerName == null || reviewerName.isBlank() || reviewerName.length() > 60
-                || rating < 1 || rating > 5 || comment == null || comment.isBlank() || comment.length() > 1500) {
-            redirect.addFlashAttribute("error", "Please enter a name, choose 1–5 stars, and write a review (max 1500 characters).");
+
+        if (reviewerName == null || reviewerName.isBlank()
+                || reviewerName.length() > 60
+                || rating < 1 || rating > 5
+                || comment == null || comment.isBlank()
+                || comment.length() > 1500) {
+            redirect.addFlashAttribute("error",
+                    "Please enter a name, choose 1–5 stars, and write a review (max 1500 characters).");
             return "redirect:/products/" + id;
         }
-        reviews.save(new Review(reviewerName.trim(), rating, comment.trim(), product.get()));
-        redirect.addFlashAttribute("success", "Thanks! Your review has been submitted.");
+
+        reviews.save(new Review(reviewerName.trim(), rating,
+                comment.trim(), product.get()));
+
+        redirect.addFlashAttribute("success",
+                "Thanks! Your review has been submitted.");
         return "redirect:/products/" + id;
     }
 }
+```
