@@ -1,4 +1,4 @@
-```java
+java
 package com.ratemate.model;
 
 import jakarta.persistence.*;
@@ -88,4 +88,4 @@ public class Review {
         this.editToken = editToken;
     }
 }
-```
+
