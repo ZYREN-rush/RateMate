@@ -1,4 +1,4 @@
-```java
+
 package com.ratemate;
 
 import org.springframework.boot.CommandLineRunner;
@@ -79,4 +79,3 @@ public class RateMateApplication {
         }
     }
 }
-```
