@@ -20,13 +20,17 @@ public class Review {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(length = 36)
+    private String editToken;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
 
     public Review() {}
 
-    public Review(String reviewerName, int rating, String comment, Product product) {
+    public Review(String reviewerName, int rating,
+                  String comment, Product product) {
         this.reviewerName = reviewerName;
         this.rating = rating;
         this.comment = comment;
@@ -58,6 +62,10 @@ public class Review {
         return createdAt;
     }
 
+    public String getEditToken() {
+        return editToken;
+    }
+
     public String getFormattedDate() {
         return createdAt.format(
             DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")
@@ -74,6 +82,10 @@ public class Review {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public void setEditToken(String editToken) {
+        this.editToken = editToken;
     }
 }
 ```
